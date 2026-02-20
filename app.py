@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, request
 from models import db, User, Stats
 
 app = Flask(__name__)
@@ -55,6 +55,42 @@ def dashboard():
         return redirect(url_for("login"))
 
     return render_template("dashboard.html", user=user, stats=stats)
+@app.route("/choose", methods=["POST"])
+def choose():
+    choice = request.form.get("choice")  # "A", "B" ou "C"
+
+    stats = Stats.query.first()
+    if not stats:
+        return redirect(url_for("dashboard"))
+
+    # Regras simples (depois a gente melhora)
+    if choice == "A":
+        stats.xp += 40
+        stats.reputation += 5
+        stats.stress += 10
+    elif choice == "B":
+        stats.xp += 20
+        stats.reputation -= 2
+        stats.stress += 6
+    elif choice == "C":
+        stats.xp -= 10
+        stats.reputation -= 6
+        stats.stress -= 8
+
+    # travas para não quebrar a UI
+    stats.reputation = max(0, min(100, stats.reputation))
+    stats.stress = max(0, min(100, stats.stress))
+    stats.xp = max(0, stats.xp)
+
+    # Se XP passar do máximo, sobe level (simples)
+    while stats.xp >= stats.xp_max:
+        stats.xp -= stats.xp_max
+        stats.level += 1
+        stats.xp_max = int(stats.xp_max * 1.15)  # aumenta um pouco a meta
+        stats.salary += 500
+
+    db.session.commit()
+    return redirect(url_for("dashboard"))
 
 @app.route("/login")
 def login():
