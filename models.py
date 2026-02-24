@@ -1,12 +1,15 @@
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 db = SQLAlchemy()
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
 
     stats = db.relationship("Stats", backref="user", uselist=False)
+
 
 class Stats(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -20,3 +23,16 @@ class Stats(db.Model):
     salary = db.Column(db.Integer, default=2000)
     reputation = db.Column(db.Integer, default=50)
     stress = db.Column(db.Integer, default=10)
+
+
+class DecisionLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    choice = db.Column(db.String(1), nullable=False)  # A, B, C
+
+    delta_xp = db.Column(db.Integer, default=0)
+    delta_reputation = db.Column(db.Integer, default=0)
+    delta_stress = db.Column(db.Integer, default=0)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
