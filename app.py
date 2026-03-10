@@ -1,3 +1,4 @@
+import random
 from flask import Flask, render_template, redirect, url_for, request, flash
 from models import db, User, Stats, DecisionLog
 
@@ -31,6 +32,30 @@ def seed_data():
     db.session.add(stats)
     db.session.commit()
 
+challenges = [
+    {
+        "title": "Incidente em produção",
+        "prompt": "O servidor caiu em produção. O que você faz?",
+        "a": "Revisar logs e métricas",
+        "b": "Reiniciar o servidor imediatamente",
+        "c": "Tomar um café e esperar alguém falar"
+    },
+    {
+        "title": "Pull Request gigante",
+        "prompt": "Você recebeu um PR enorme e sem testes. O que faz?",
+        "a": "Pede ajustes e sugere testes",
+        "b": "Aprova rápido para não atrasar a sprint",
+        "c": "Ignora e deixa para depois"
+    },
+    {
+        "title": "Bug crítico do cliente",
+        "prompt": "Um cliente relatou um bug crítico em produção. Como você reage?",
+        "a": "Reproduz o bug e cria um hotfix",
+        "b": "Responde que vai olhar depois",
+        "c": "Fecha o ticket sem investigar"
+    }
+]
+
 
 @app.route("/")
 def home():
@@ -46,22 +71,14 @@ def dashboard():
     if not user or not stats:
         return redirect(url_for("login"))
 
-    # status textual do jogador
-    if stats.stress >= 90:
-        player_status = "Em risco de burnout"
-    elif stats.reputation >= 80:
-        player_status = "Profissional em destaque"
-    elif stats.xp >= stats.xp_max * 0.8:
-        player_status = "Próximo de subir de nível"
-    else:
-        player_status = "Em desenvolvimento"
+    current_challenge = random.choice(challenges)
 
     return render_template(
         "dashboard.html",
         user=user,
         stats=stats,
         logs=logs,
-        player_status=player_status
+        current_challenge=current_challenge
     )
 
 @app.route("/choose", methods=["POST"])

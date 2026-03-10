@@ -73,10 +73,10 @@
     <div class="card shadow-sm border-0 mt-4">
       <div class="card-body p-4">
 
-        <h2 class="h5 mb-2">Desafio da Semana</h2>
-        <p class="text-secondary small mb-3">
-          O servidor caiu em produção. O que você faz?
-        </p>
+        <h2 class="h5 mb-2">{{ current_challenge.title }}</h2>
+<p class="text-secondary small mb-3">
+  {{ current_challenge.prompt }}
+</p>
 
         <form method="POST" action="{{ url_for('choose') }}" class="d-grid gap-2 mt-3">
 
@@ -86,7 +86,7 @@
             value="A"
             type="submit"
           >
-            A) Revisar logs (+XP, +Reputação, +Stress)
+            A) {{ current_challenge.a }}
           </button>
 
           <button
@@ -95,7 +95,7 @@
             value="B"
             type="submit"
           >
-            B) Reiniciar servidor (+XP, -Reputação, +Stress)
+            B) {{ current_challenge.b }}
           </button>
 
           <button
@@ -104,7 +104,7 @@
             value="C"
             type="submit"
           >
-            C) Tomar café (-XP, -Reputação, -Stress)
+            C) {{ current_challenge.c }}
           </button>
 
         </form>
