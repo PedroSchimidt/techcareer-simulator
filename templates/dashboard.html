@@ -74,11 +74,12 @@
       <div class="card-body p-4">
 
         <h2 class="h5 mb-2">{{ current_challenge.title }}</h2>
-<p class="text-secondary small mb-3">
-  {{ current_challenge.prompt }}
-</p>
+        <p class="text-secondary small mb-3">
+          {{ current_challenge.prompt }}
+        </p>
 
         <form method="POST" action="{{ url_for('choose') }}" class="d-grid gap-2 mt-3">
+          <input type="hidden" name="challenge_id" value="{{ current_challenge.id }}">
 
           <button
             class="btn btn-primary"
@@ -86,7 +87,7 @@
             value="A"
             type="submit"
           >
-            A) {{ current_challenge.a }}
+            A) {{ current_challenge.a.text }}
           </button>
 
           <button
@@ -95,7 +96,7 @@
             value="B"
             type="submit"
           >
-            B) {{ current_challenge.b }}
+            B) {{ current_challenge.b.text }}
           </button>
 
           <button
@@ -104,7 +105,7 @@
             value="C"
             type="submit"
           >
-            C) {{ current_challenge.c }}
+            C) {{ current_challenge.c.text }}
           </button>
 
         </form>
@@ -143,38 +144,41 @@
       </div>
     </div>
 
-<div class="card shadow-sm border-0 mt-4">
-  <div class="card-body p-4">
-    <h2 class="h5 mb-3">Últimas decisões</h2>
+    <div class="card shadow-sm border-0 mt-4">
+      <div class="card-body p-4">
+        <h2 class="h5 mb-3">Últimas decisões</h2>
 
-    {% if logs and logs|length > 0 %}
-      <div class="decision-list">
-        {% for l in logs %}
-          <div class="decision-item">
-            <div class="decision-top">
-              <div class="fw-semibold">Opção {{ l.choice }}</div>
-              <span class="text-secondary small">{{ l.created_at.strftime("%d/%m %H:%M") }}</span>
-            </div>
+        {% if logs and logs|length > 0 %}
+          <div class="decision-list">
+            {% for l in logs %}
+              <div class="decision-item">
+                <div class="decision-top">
+                  <div class="fw-semibold">Opção {{ l.choice }}</div>
+                  <span class="text-secondary small">{{ l.created_at.strftime("%d/%m %H:%M") }}</span>
+                </div>
 
-            <div class="decision-stats mt-2">
-              <span class="decision-pill {% if l.delta_xp >= 0 %}pill-positive{% else %}pill-negative{% endif %}">
-                XP {{ "+" if l.delta_xp > 0 else "" }}{{ l.delta_xp }}
-              </span>
+                <div class="decision-stats mt-2">
+                  <span class="decision-pill {% if l.delta_xp >= 0 %}pill-positive{% else %}pill-negative{% endif %}">
+                    XP {{ "+" if l.delta_xp > 0 else "" }}{{ l.delta_xp }}
+                  </span>
 
-              <span class="decision-pill {% if l.delta_reputation >= 0 %}pill-positive{% else %}pill-negative{% endif %}">
-                Rep {{ "+" if l.delta_reputation > 0 else "" }}{{ l.delta_reputation }}
-              </span>
+                  <span class="decision-pill {% if l.delta_reputation >= 0 %}pill-positive{% else %}pill-negative{% endif %}">
+                    Rep {{ "+" if l.delta_reputation > 0 else "" }}{{ l.delta_reputation }}
+                  </span>
 
-              <span class="decision-pill {% if l.delta_stress <= 0 %}pill-positive{% else %}pill-negative{% endif %}">
-                Stress {{ "+" if l.delta_stress > 0 else "" }}{{ l.delta_stress }}
-              </span>
-            </div>
+                  <span class="decision-pill {% if l.delta_stress <= 0 %}pill-positive{% else %}pill-negative{% endif %}">
+                    Stress {{ "+" if l.delta_stress > 0 else "" }}{{ l.delta_stress }}
+                  </span>
+                </div>
+              </div>
+            {% endfor %}
           </div>
-        {% endfor %}
+        {% else %}
+          <p class="text-secondary mb-0">Nenhuma decisão registrada ainda.</p>
+        {% endif %}
       </div>
-    {% else %}
-      <p class="text-secondary mb-0">Nenhuma decisão registrada ainda.</p>
-    {% endif %}
+    </div>
   </div>
+
 </div>
 {% endblock %}
