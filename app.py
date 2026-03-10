@@ -46,8 +46,23 @@ def dashboard():
     if not user or not stats:
         return redirect(url_for("login"))
 
-    return render_template("dashboard.html", user=user, stats=stats, logs=logs)
+    # status textual do jogador
+    if stats.stress >= 90:
+        player_status = "Em risco de burnout"
+    elif stats.reputation >= 80:
+        player_status = "Profissional em destaque"
+    elif stats.xp >= stats.xp_max * 0.8:
+        player_status = "Próximo de subir de nível"
+    else:
+        player_status = "Em desenvolvimento"
 
+    return render_template(
+        "dashboard.html",
+        user=user,
+        stats=stats,
+        logs=logs,
+        player_status=player_status
+    )
 
 @app.route("/choose", methods=["POST"])
 def choose():
