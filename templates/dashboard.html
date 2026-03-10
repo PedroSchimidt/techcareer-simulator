@@ -16,22 +16,31 @@
 
 <div class="row g-4">
 
-  <!-- COLUNA ESQUERDA -->
   <div class="col-12 col-lg-4">
-    <div class="card shadow-sm border-0">
+    <div class="card shadow-sm border-0 profile-card">
       <div class="card-body p-4">
 
-        <h1 class="h5 mb-1">{{ user.username }}</h1>
-        <p class="text-secondary mb-3">
-          Level {{ stats.level }} • Backend
-        </p>
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div>
+            <h1 class="h4 mb-1">{{ user.username }}</h1>
+            <p class="text-secondary mb-0">Level {{ stats.level }} • Backend</p>
+          </div>
+          <span class="level-badge">Lv. {{ stats.level }}</span>
+        </div>
 
-        <!-- XP -->
+        {% if stats.stress >= 90 %}
+          <div class="status-chip danger-soft mb-3">Em risco de burnout</div>
+        {% elif stats.reputation >= 80 %}
+          <div class="status-chip success-soft mb-3">Profissional em destaque</div>
+        {% elif stats.xp >= stats.xp_max * 0.8 %}
+          <div class="status-chip info-soft mb-3">Próximo de subir de nível</div>
+        {% else %}
+          <div class="status-chip neutral-soft mb-3">Em desenvolvimento</div>
+        {% endif %}
+
         <div class="mb-2 small text-secondary">XP</div>
         <div class="progress mb-2">
-          <div class="progress-bar"
-               style="width: {{ (stats.xp / stats.xp_max) * 100 }}%">
-          </div>
+          <div class="progress-bar" style="width: {{ (stats.xp / stats.xp_max) * 100 }}%"></div>
         </div>
 
         <div class="d-flex justify-content-between small text-secondary mb-3">
@@ -41,44 +50,60 @@
 
         <hr>
 
-        <!-- SALÁRIO -->
-        <div class="d-flex justify-content-between">
+        <div class="info-row">
           <span class="text-secondary">Salário</span>
           <span class="fw-semibold">R$ {{ stats.salary }}</span>
+        </div>
+
+        <div class="info-row">
+          <span class="text-secondary">Reputação</span>
+          <span class="fw-semibold">{{ stats.reputation }}%</span>
+        </div>
+
+        <div class="info-row">
+          <span class="text-secondary">Stress</span>
+          <span class="fw-semibold {% if stats.stress >= 90 %}text-danger{% endif %}">
+            {{ stats.stress }}%
+          </span>
         </div>
 
       </div>
     </div>
 
-    <!-- DESAFIO DA SEMANA -->
     <div class="card shadow-sm border-0 mt-4">
       <div class="card-body p-4">
 
-        <h2 class="h6 mb-3">Desafio da Semana</h2>
-        <p class="text-secondary small">
+        <h2 class="h5 mb-2">Desafio da Semana</h2>
+        <p class="text-secondary small mb-3">
           O servidor caiu em produção. O que você faz?
         </p>
 
         <form method="POST" action="{{ url_for('choose') }}" class="d-grid gap-2 mt-3">
 
-          <button class="btn btn-primary"
-                  name="choice"
-                  value="A"
-                  type="submit">
+          <button
+            class="btn btn-primary"
+            name="choice"
+            value="A"
+            type="submit"
+          >
             A) Revisar logs (+XP, +Reputação, +Stress)
           </button>
 
-          <button class="btn btn-outline-primary"
-                  name="choice"
-                  value="B"
-                  type="submit">
+          <button
+            class="btn btn-outline-primary"
+            name="choice"
+            value="B"
+            type="submit"
+          >
             B) Reiniciar servidor (+XP, -Reputação, +Stress)
           </button>
 
-          <button class="btn btn-outline-danger"
-                  name="choice"
-                  value="C"
-                  type="submit">
+          <button
+            class="btn btn-outline-danger"
+            name="choice"
+            value="C"
+            type="submit"
+          >
             C) Tomar café (-XP, -Reputação, -Stress)
           </button>
 
@@ -86,67 +111,70 @@
 
       </div>
     </div>
-
   </div>
 
-  <!-- COLUNA DIREITA -->
   <div class="col-12 col-lg-8">
     <div class="card shadow-sm border-0">
       <div class="card-body p-4">
 
-        <h2 class="h5 mb-3">Status</h2>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2 class="h4 mb-0">Status</h2>
+          {% if stats.stress >= 90 %}
+            <span class="danger-chip">Stress crítico</span>
+          {% endif %}
+        </div>
 
-        <!-- REPUTAÇÃO -->
         <div class="mb-2 d-flex justify-content-between small">
           <span>Reputação</span>
           <span>{{ stats.reputation }}%</span>
         </div>
         <div class="progress mb-4">
-          <div class="progress-bar"
-               style="width: {{ stats.reputation }}%">
-          </div>
+          <div class="progress-bar" style="width: {{ stats.reputation }}%"></div>
         </div>
 
-        <!-- STRESS -->
         <div class="mb-2 d-flex justify-content-between small">
           <span>Stress</span>
           <span>{{ stats.stress }}%</span>
         </div>
         <div class="progress">
-          <div class="progress-bar bg-danger"
-               style="width: {{ stats.stress }}%">
-          </div>
+          <div class="progress-bar bg-danger" style="width: {{ stats.stress }}%"></div>
         </div>
 
       </div>
     </div>
 
-    <!-- ÚLTIMAS DECISÕES -->
-    <div class="card shadow-sm border-0 mt-4">
-      <div class="card-body p-4">
-        <h2 class="h6 mb-3">Últimas decisões</h2>
+<div class="card shadow-sm border-0 mt-4">
+  <div class="card-body p-4">
+    <h2 class="h5 mb-3">Últimas decisões</h2>
 
-        {% if logs and logs|length > 0 %}
-          <div class="list-group">
-            {% for l in logs %}
-              <div class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                  <div class="fw-semibold">Opção {{ l.choice }}</div>
-                  <div class="text-secondary small">
-                    XP {{ l.delta_xp }}, Rep {{ l.delta_reputation }}, Stress {{ l.delta_stress }}
-                  </div>
-                </div>
-                <span class="text-secondary small">{{ l.created_at.strftime("%d/%m %H:%M") }}</span>
-              </div>
-            {% endfor %}
+    {% if logs and logs|length > 0 %}
+      <div class="decision-list">
+        {% for l in logs %}
+          <div class="decision-item">
+            <div class="decision-top">
+              <div class="fw-semibold">Opção {{ l.choice }}</div>
+              <span class="text-secondary small">{{ l.created_at.strftime("%d/%m %H:%M") }}</span>
+            </div>
+
+            <div class="decision-stats mt-2">
+              <span class="decision-pill {% if l.delta_xp >= 0 %}pill-positive{% else %}pill-negative{% endif %}">
+                XP {{ "+" if l.delta_xp > 0 else "" }}{{ l.delta_xp }}
+              </span>
+
+              <span class="decision-pill {% if l.delta_reputation >= 0 %}pill-positive{% else %}pill-negative{% endif %}">
+                Rep {{ "+" if l.delta_reputation > 0 else "" }}{{ l.delta_reputation }}
+              </span>
+
+              <span class="decision-pill {% if l.delta_stress <= 0 %}pill-positive{% else %}pill-negative{% endif %}">
+                Stress {{ "+" if l.delta_stress > 0 else "" }}{{ l.delta_stress }}
+              </span>
+            </div>
           </div>
-        {% else %}
-          <p class="text-secondary mb-0">Nenhuma decisão registrada ainda.</p>
-        {% endif %}
+        {% endfor %}
       </div>
-    </div>
-
+    {% else %}
+      <p class="text-secondary mb-0">Nenhuma decisão registrada ainda.</p>
+    {% endif %}
   </div>
-
 </div>
 {% endblock %}
