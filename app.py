@@ -175,12 +175,13 @@ def choose():
         stats.salary += 500
 
     log = DecisionLog(
-        user_id=stats.user_id,
-        choice=choice,
-        delta_xp=delta_xp,
-        delta_reputation=delta_rep,
-        delta_stress=delta_stress
-    )
+    user_id=stats.user_id,
+    choice=choice,
+    delta_xp=delta_xp,
+    delta_reputation=delta_rep,
+    delta_stress=delta_stress,
+    challenge_title=challenge["title"]
+)
     db.session.add(log)
 
     db.session.commit()

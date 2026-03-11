@@ -153,7 +153,9 @@
             {% for l in logs %}
               <div class="decision-item">
                 <div class="decision-top">
-                  <div class="fw-semibold">Opção {{ l.choice }}</div>
+                  <div class="fw-semibold">
+                    {{ l.challenge_title if l.challenge_title else "Desafio" }} — Opção {{ l.choice }}
+                  </div>
                   <span class="text-secondary small">{{ l.created_at.strftime("%d/%m %H:%M") }}</span>
                 </div>
 

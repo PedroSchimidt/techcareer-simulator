@@ -29,10 +29,12 @@ class DecisionLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    choice = db.Column(db.String(1), nullable=False)  # A, B, C
+    choice = db.Column(db.String(1), nullable=False)
 
     delta_xp = db.Column(db.Integer, default=0)
     delta_reputation = db.Column(db.Integer, default=0)
     delta_stress = db.Column(db.Integer, default=0)
+
+    challenge_title = db.Column(db.String(150), nullable=True)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
