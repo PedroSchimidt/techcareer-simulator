@@ -115,7 +115,7 @@ def seed_data():
 # -----------------------------
 @app.route("/")
 def home():
-    return redirect(url_for("dashboard"))
+    return redirect(url_for("home.html"))
 
 
 @app.route("/dashboard")
@@ -247,9 +247,6 @@ def ranking():
     )
     return render_template("ranking.html", ranking=ranking_data)
 
-@app.route("/")
-def home():
-    return render_template("home.html")
 
 
 if __name__ == "__main__":
