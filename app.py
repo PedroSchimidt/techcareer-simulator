@@ -10,28 +10,9 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
 
-
-def seed_data():
-    """Cria um usuário e stats iniciais se o banco estiver vazio."""
-    if User.query.first():
-        return
-
-    user = User(username="PedroDev")
-    db.session.add(user)
-    db.session.commit()
-
-    stats = Stats(
-        user_id=user.id,
-        level=3,
-        xp=850,
-        xp_max=1200,
-        salary=7500,
-        reputation=68,
-        stress=72,
-    )
-    db.session.add(stats)
-    db.session.commit()
-
+# -----------------------------
+# DESAFIOS DINÂMICOS
+# -----------------------------
 challenges = [
     {
         "id": 1,
@@ -105,6 +86,33 @@ challenges = [
 ]
 
 
+# -----------------------------
+# DADOS INICIAIS
+# -----------------------------
+def seed_data():
+    if User.query.first():
+        return
+
+    user = User(username="PedroDev")
+    db.session.add(user)
+    db.session.commit()
+
+    stats = Stats(
+        user_id=user.id,
+        level=3,
+        xp=850,
+        xp_max=1200,
+        salary=7500,
+        reputation=68,
+        stress=72
+    )
+    db.session.add(stats)
+    db.session.commit()
+
+
+# -----------------------------
+# ROTAS
+# -----------------------------
 @app.route("/")
 def home():
     return redirect(url_for("dashboard"))
@@ -128,6 +136,7 @@ def dashboard():
         logs=logs,
         current_challenge=current_challenge
     )
+
 
 @app.route("/choose", methods=["POST"])
 def choose():
@@ -153,10 +162,12 @@ def choose():
     stats.reputation += delta_rep
     stats.stress += delta_stress
 
+    # limites para não quebrar a interface
     stats.reputation = max(0, min(100, stats.reputation))
     stats.stress = max(0, min(100, stats.stress))
     stats.xp = max(0, stats.xp)
 
+    # level up
     while stats.xp >= stats.xp_max:
         stats.xp -= stats.xp_max
         stats.level += 1
