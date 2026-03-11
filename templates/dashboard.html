@@ -155,6 +155,22 @@
 
     <div class="card shadow-sm border-0 mt-4">
       <div class="card-body p-4">
+        <h2 class="h5 mb-3">Conquistas</h2>
+
+        {% if achievements and achievements|length > 0 %}
+          <div class="achievement-list">
+            {% for achievement in achievements %}
+              <span class="achievement-badge">🏆 {{ achievement }}</span>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-secondary mb-0">Nenhuma conquista desbloqueada ainda.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mt-4">
+      <div class="card-body p-4">
         <h2 class="h5 mb-3">Últimas decisões</h2>
 
         {% if logs and logs|length > 0 %}

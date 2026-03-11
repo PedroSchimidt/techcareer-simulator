@@ -129,12 +129,26 @@ def dashboard():
 
     current_challenge = random.choice(challenges)
 
+    achievements = []
+
+    if len(logs) >= 1:
+        achievements.append("Primeiro passo")
+    if stats.level >= 4:
+        achievements.append("Em ascensão")
+    if stats.reputation >= 80:
+        achievements.append("Boa reputação")
+    if stats.stress >= 95:
+        achievements.append("Burnout")
+    if stats.xp >= stats.xp_max * 0.8:
+        achievements.append("Quase lá")
+
     return render_template(
         "dashboard.html",
         user=user,
         stats=stats,
         logs=logs,
-        current_challenge=current_challenge
+        current_challenge=current_challenge,
+        achievements=achievements
     )
 
 
@@ -232,6 +246,10 @@ def ranking():
         .all()
     )
     return render_template("ranking.html", ranking=ranking_data)
+
+@app.route("/")
+def home():
+    return render_template("home.html")
 
 
 if __name__ == "__main__":
