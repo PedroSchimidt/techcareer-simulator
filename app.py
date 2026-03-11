@@ -193,6 +193,29 @@ def choose():
 
     return redirect(url_for("dashboard"))
 
+@app.route("/reset", methods=["POST"])
+def reset():
+    stats = Stats.query.first()
+
+    if not stats:
+        return redirect(url_for("dashboard"))
+
+    # apaga histórico
+    DecisionLog.query.delete()
+
+    # reseta os atributos
+    stats.level = 3
+    stats.xp = 850
+    stats.xp_max = 1200
+    stats.salary = 7500
+    stats.reputation = 68
+    stats.stress = 72
+
+    db.session.commit()
+
+    flash("Progresso resetado com sucesso.", "info")
+    return redirect(url_for("dashboard"))
+
 
 @app.route("/login")
 def login():
