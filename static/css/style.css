@@ -290,3 +290,43 @@ box-shadow:0 0 0 0 rgba(59,130,246,0);
 transform:scale(1.08);
 background:linear-gradient(45deg,#1d4ed8,#2563eb);
 }
+
+/* LOGIN PAGE */
+
+.login-wrapper{
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:70vh;
+}
+
+.login-card{
+background:#0a0a0a;
+padding:40px;
+border-radius:16px;
+width:400px;
+box-shadow:0 15px 40px rgba(0,0,0,0.5);
+}
+
+.login-title{
+text-align:center;
+font-weight:700;
+margin-bottom:10px;
+}
+
+.login-subtitle{
+text-align:center;
+color:#cfcfcf;
+margin-bottom:30px;
+}
+
+.login-register{
+text-align:center;
+margin-top:15px;
+font-size:14px;
+}
+
+.login-register a{
+color:#3b82f6;
+text-decoration:none;
+}

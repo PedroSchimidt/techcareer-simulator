@@ -2,10 +2,41 @@
 {% block title %}Login • TechCareer{% endblock %}
 
 {% block content %}
-<div class="card shadow-sm border-0">
-  <div class="card-body p-4">
-    <h1 class="h4 mb-2">Login</h1>
-    <p class="text-secondary mb-0">Tela provisória ✅ Depois a gente implementa login real.</p>
-  </div>
+
+<div class="login-wrapper">
+
+<div class="login-card">
+
+<h1 class="login-title">🔐 Login</h1>
+
+<p class="login-subtitle">
+Acesse sua conta para continuar sua carreira tech.
+</p>
+
+<form>
+
+<div class="mb-3">
+<label class="form-label">Email</label>
+<input type="email" class="form-control" placeholder="seuemail@email.com">
 </div>
+
+<div class="mb-3">
+<label class="form-label">Senha</label>
+<input type="password" class="form-control" placeholder="••••••••">
+</div>
+
+<button class="btn start-btn w-100">
+Entrar
+</button>
+
+<p class="login-register">
+Não possui conta? <a href="#">Criar conta</a>
+</p>
+
+</form>
+
+</div>
+
+</div>
+
 {% endblock %}
