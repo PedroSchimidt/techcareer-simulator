@@ -4,39 +4,29 @@
 {% block content %}
 
 <div class="login-wrapper">
-
 <div class="login-card">
 
 <h1 class="login-title">🔐 Login</h1>
 
-<p class="login-subtitle">
-Acesse sua conta para continuar sua carreira tech.
-</p>
-
-<form>
+<form method="POST">
 
 <div class="mb-3">
-<label class="form-label">Email</label>
-<input type="email" class="form-control" placeholder="seuemail@email.com">
+<label>Nome de usuário</label>
+<input type="text" name="username" class="form-control" required>
 </div>
 
 <div class="mb-3">
-<label class="form-label">Senha</label>
-<input type="password" class="form-control" placeholder="••••••••">
+<label>Senha</label>
+<input type="password" name="password" class="form-control" required>
 </div>
 
-<button class="btn start-btn w-100">
+<button type="submit" class="btn start-btn w-100">
 Entrar
 </button>
-
-<p class="login-register">
-Não possui conta? <a href="#">Criar conta</a>
-</p>
 
 </form>
 
 </div>
-
 </div>
 
 {% endblock %}

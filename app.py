@@ -1,5 +1,5 @@
 import random
-from flask import Flask, render_template, redirect, url_for, request, flash
+from flask import Flask, render_template, redirect, url_for, request, flash, session
 from models import db, User, Stats, DecisionLog
 
 app = Flask(__name__)
@@ -115,14 +115,24 @@ def seed_data():
 # -----------------------------
 @app.route("/")
 def home():
+    session.clear()
     return render_template("home.html")
 
 
 @app.route("/dashboard")
 def dashboard():
-    user = User.query.first()
-    stats = Stats.query.first()
-    logs = DecisionLog.query.order_by(DecisionLog.created_at.desc()).limit(5).all()
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect(url_for("login"))
+    user = User.query.get(user_id)
+    stats = Stats.query.filter_by(user_id=user_id).first()
+    logs = (
+    DecisionLog.query
+    .filter_by(user_id=user_id)
+    .order_by(DecisionLog.created_at.desc())
+    .limit(5)
+    .all()
+)
 
     if not user or not stats:
         return redirect(url_for("login"))
@@ -157,11 +167,14 @@ def choose():
     choice = request.form.get("choice")
     challenge_id = request.form.get("challenge_id", type=int)
 
-    stats = Stats.query.first()
-    if not stats:
-        return redirect(url_for("dashboard"))
+    user_id = session.get("user_id")
 
+    if not user_id:
+        return redirect(url_for("login"))
+
+    stats = Stats.query.filter_by(user_id=user_id).first()
     challenge = next((c for c in challenges if c["id"] == challenge_id), None)
+    
     if not challenge:
         flash("Desafio não encontrado.", "info")
         return redirect(url_for("dashboard"))
@@ -231,9 +244,34 @@ def reset():
     return redirect(url_for("dashboard"))
 
 
-@app.route("/login")
+@app.route("/login", methods=["GET", "POST"])
 def login():
+
+    if request.method == "POST":
+
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        user = User.query.filter_by(username=username).first()
+
+        if user and password == "123":  # login provisório
+
+            session["user_id"] = user.id
+
+            flash("Login realizado com sucesso!", "success")
+            return redirect(url_for("dashboard"))
+
+        flash("Usuário ou senha inválidos.", "danger")
+
     return render_template("login.html")
+
+@app.route("/logout")
+def logout():
+
+    session.clear()
+
+    flash("Logout realizado.", "info")
+    return redirect(url_for("home"))
 
 
 @app.route("/ranking")
