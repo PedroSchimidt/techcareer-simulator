@@ -115,7 +115,7 @@ def seed_data():
 # -----------------------------
 @app.route("/")
 def home():
-    return redirect(url_for("home.html"))
+    return render_template("home.html")
 
 
 @app.route("/dashboard")

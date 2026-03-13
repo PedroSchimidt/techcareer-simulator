@@ -210,3 +210,48 @@ hr {
   font-size: 0.85rem;
   font-weight: 700;
 }
+
+.hero{
+    text-align:center;
+    padding:120px 20px 80px 20px;
+}
+
+.hero h1{
+    font-size:64px;
+    font-weight:800;
+}
+
+.hero p{
+    color:#cbd5f5;
+    font-size:20px;
+}
+
+.start-btn{
+    margin-top:30px;
+    padding:15px 40px;
+    font-size:20px;
+    border-radius:12px;
+}
+
+.features{
+    margin-top:80px;
+}
+
+.feature-card{
+    background:#1e293b;
+    border:none;
+    border-radius:16px;
+    padding:30px;
+    transition:0.3s;
+}
+
+.feature-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 15px 35px rgba(0,0,0,0.4);
+}
+
+.feature-icon{
+    font-size:40px;
+    margin-bottom:15px;
+    color:#3b82f6;
+}
