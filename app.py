@@ -265,6 +265,44 @@ def login():
 
     return render_template("login.html")
 
+@app.route("/register", methods=["GET", "POST"])
+def register():
+
+    if request.method == "POST":
+
+        username = request.form.get("username")
+        password = request.form.get("password")
+
+        existing_user = User.query.filter_by(username=username).first()
+
+        if existing_user:
+            flash("Nome de usuário já existe.", "danger")
+            return redirect(url_for("register"))
+
+        new_user = User(username=username)
+        db.session.add(new_user)
+        db.session.commit()
+
+        # cria stats iniciais
+        stats = Stats(
+            user_id=new_user.id,
+            level=1,
+            xp=0,
+            xp_max=100,
+            salary=2000,
+            reputation=50,
+            stress=20
+        )
+
+        db.session.add(stats)
+        db.session.commit()
+
+        flash("Conta criada com sucesso!", "success")
+
+        return redirect(url_for("login"))
+
+    return render_template("register.html")
+
 @app.route("/logout")
 def logout():
 

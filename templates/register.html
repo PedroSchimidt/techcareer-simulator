@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% block title %}Login • TechCareer{% endblock %}
+{% block title %}Criar conta • TechCareer{% endblock %}
 
 {% block content %}
 
 <div class="login-wrapper">
 <div class="login-card">
 
-<h1 class="login-title">🔐 Login</h1>
+<h1 class="login-title">Criar Conta</h1>
 
 <form method="POST">
 
@@ -20,13 +20,8 @@
 <input type="password" name="password" class="form-control" required>
 </div>
 
-<p class="text-center mt-3">
-Não tem conta?
-<a href="{{ url_for('register') }}">Criar conta</a>
-</p>
-
 <button type="submit" class="btn start-btn w-100">
-Entrar
+Criar conta
 </button>
 
 </form>
