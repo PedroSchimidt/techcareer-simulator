@@ -1,11 +1,56 @@
 {% extends "base.html" %}
+
 {% block title %}Ranking • TechCareer{% endblock %}
 
 {% block content %}
+
 <div class="card shadow-sm border-0">
-  <div class="card-body p-4">
-    <h1 class="h4 mb-2">Ranking</h1>
-    <p class="text-secondary mb-0">Página provisória </p>
-  </div>
+<div class="card-body">
+
+<h2 class="mb-4">🏆 Ranking dos Desenvolvedores</h2>
+
+<table class="table table-dark table-hover align-middle">
+
+<thead>
+<tr>
+<th>#</th>
+<th>Usuário</th>
+<th>Nível</th>
+<th>Salário</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for user in ranking %}
+
+<tr>
+
+<td>
+{% if loop.index == 1 %}
+🥇
+{% elif loop.index == 2 %}
+🥈
+{% elif loop.index == 3 %}
+🥉
+{% else %}
+{{ loop.index }}
+{% endif %}
+</td>
+
+<td>{{ user.username }}</td>
+<td>Lv. {{ user.level }}</td>
+<td>R$ {{ user.salary }}</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
 </div>
+</div>
+
 {% endblock %}

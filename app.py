@@ -99,12 +99,12 @@ def seed_data():
 
     stats = Stats(
         user_id=user.id,
-        level=3,
-        xp=850,
-        xp_max=1200,
-        salary=7500,
-        reputation=68,
-        stress=72
+        level=1,
+        xp=750,
+        xp_max=1110,
+        salary=3500,
+        reputation=60,
+        stress=50
     )
     db.session.add(stats)
     db.session.commit()
@@ -287,12 +287,12 @@ def register():
         stats = Stats(
             user_id=new_user.id,
             level=1,
-            xp=0,
-            xp_max=100,
-            salary=2000,
-            reputation=50,
-            stress=20
-        )
+            xp=750,
+            xp_max=1110,
+            salary=3500,
+            reputation=60,
+            stress=50
+    )
 
         db.session.add(stats)
         db.session.commit()
