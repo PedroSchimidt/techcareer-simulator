@@ -17,7 +17,12 @@
 
 <div class="mb-3">
 <label>Senha</label>
-<input type="password" name="password" class="form-control" required>
+<div class="password-input-wrapper">
+<input type="password" name="password" id="password-register" class="form-control" required autocomplete="new-password">
+<button type="button" class="btn-toggle-password" onclick="togglePassword('password-register', this)" title="Mostrar senha" aria-label="Mostrar senha">
+<span class="icon-show">👁</span><span class="icon-hide" style="display:none">🙈</span>
+</button>
+</div>
 </div>
 
 <button type="submit" class="btn start-btn w-100">
@@ -29,4 +34,22 @@ Criar conta
 </div>
 </div>
 
+<script>
+function togglePassword(inputId, btn) {
+  var input = document.getElementById(inputId);
+  var showIcon = btn.querySelector('.icon-show');
+  var hideIcon = btn.querySelector('.icon-hide');
+  if (input.type === 'password') {
+    input.type = 'text';
+    showIcon.style.display = 'none';
+    hideIcon.style.display = 'inline';
+    btn.setAttribute('title', 'Ocultar senha');
+  } else {
+    input.type = 'password';
+    showIcon.style.display = 'inline';
+    hideIcon.style.display = 'none';
+    btn.setAttribute('title', 'Mostrar senha');
+  }
+}
+</script>
 {% endblock %}

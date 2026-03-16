@@ -1,8 +1,25 @@
 import random
+from datetime import datetime, timezone, timedelta
 from flask import Flask, render_template, redirect, url_for, request, flash, session
 from models import db, User, Stats, DecisionLog
 
 app = Flask(__name__)
+
+# Brasília = UTC-3 (offset fixo; funciona no Windows sem pacote tzdata)
+BRASILIA = timezone(timedelta(hours=-3))
+
+
+def format_brasilia(dt):
+    """Converte datetime (UTC) para horário de Brasília e formata como dd/mm HH:mm."""
+    if dt is None:
+        return ""
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    br = dt.astimezone(BRASILIA)
+    return br.strftime("%d/%m %H:%M")
+
+
+app.jinja_env.filters["brasilia"] = format_brasilia
 
 app.config["SECRET_KEY"] = "dev"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"

@@ -8,7 +8,59 @@
 <div class="row g-4">
 
   <div class="col-12 col-lg-4">
-    <div class="card shadow-sm border-0 profile-card">
+    <div class="card shadow-sm border-0 challenge-card">
+      <div class="card-body p-4">
+
+        <p class="challenge-label text-uppercase small fw-semibold mb-1">
+          Decisão da vez
+        </p>
+
+        <h2 class="h5 mb-1">{{ current_challenge.title }}</h2>
+        <p class="text-secondary small mb-3">
+          {{ current_challenge.prompt }}
+        </p>
+
+        <p class="challenge-help text-secondary small mb-3">
+          Escolha uma das opções abaixo considerando o impacto em
+          <span class="fw-semibold">XP</span>, <span class="fw-semibold">reputação</span> e <span class="fw-semibold">stress</span> da sua carreira.
+        </p>
+
+        <form method="POST" action="{{ url_for('choose') }}" class="d-grid gap-2 mt-3 choice-buttons">
+          <input type="hidden" name="challenge_id" value="{{ current_challenge.id }}">
+
+          <button
+            class="btn btn-primary choice-btn choice-btn-a"
+            name="choice"
+            value="A"
+            type="submit"
+          >
+            A) {{ current_challenge.a.text }}
+          </button>
+
+          <button
+            class="btn btn-outline-primary choice-btn choice-btn-b"
+            name="choice"
+            value="B"
+            type="submit"
+          >
+            B) {{ current_challenge.b.text }}
+          </button>
+
+          <button
+            class="btn btn-outline-danger choice-btn choice-btn-c"
+            name="choice"
+            value="C"
+            type="submit"
+          >
+            C) {{ current_challenge.c.text }}
+          </button>
+
+        </form>
+
+      </div>
+    </div>
+
+    <div class="card shadow-sm border-0 profile-card mt-3">
       <div class="card-body p-4">
 
         <div class="d-flex justify-content-between align-items-start mb-3">
@@ -65,49 +117,6 @@
           >
             Resetar progresso
           </button>
-        </form>
-
-      </div>
-    </div>
-
-    <div class="card shadow-sm border-0 mt-4">
-      <div class="card-body p-4">
-
-        <h2 class="h5 mb-2">{{ current_challenge.title }}</h2>
-        <p class="text-secondary small mb-3">
-          {{ current_challenge.prompt }}
-        </p>
-
-        <form method="POST" action="{{ url_for('choose') }}" class="d-grid gap-2 mt-3">
-          <input type="hidden" name="challenge_id" value="{{ current_challenge.id }}">
-
-          <button
-            class="btn btn-primary"
-            name="choice"
-            value="A"
-            type="submit"
-          >
-            A) {{ current_challenge.a.text }}
-          </button>
-
-          <button
-            class="btn btn-outline-primary"
-            name="choice"
-            value="B"
-            type="submit"
-          >
-            B) {{ current_challenge.b.text }}
-          </button>
-
-          <button
-            class="btn btn-outline-danger"
-            name="choice"
-            value="C"
-            type="submit"
-          >
-            C) {{ current_challenge.c.text }}
-          </button>
-
         </form>
 
       </div>
@@ -172,7 +181,7 @@
                   <div class="fw-semibold">
                     {{ l.challenge_title if l.challenge_title else "Desafio" }} — Opção {{ l.choice }}
                   </div>
-                  <span class="text-secondary small">{{ l.created_at.strftime("%d/%m %H:%M") }}</span>
+                  <span class="text-secondary small">{{ l.created_at | brasilia }}</span>
                 </div>
 
                 <div class="decision-stats mt-2">
