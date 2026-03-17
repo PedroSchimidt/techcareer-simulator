@@ -58,7 +58,7 @@
           </span>
         </div>
 
-        <form method="POST" action="{{ url_for('reset') }}" class="mt-4">
+        <form method="POST" action="{{ url_for('reset') }}" class="mt-4" onsubmit="return confirmarReset()">
           <button
             class="btn btn-outline-secondary w-100"
             type="submit"
@@ -66,6 +66,12 @@
             Resetar progresso
           </button>
         </form>
+        
+        <script>
+        function confirmarReset() {
+          return confirm("⚠️ Tem certeza que deseja resetar seu progresso? Essa ação não pode ser desfeita.");
+        }
+        </script>
 
       </div>
     </div>

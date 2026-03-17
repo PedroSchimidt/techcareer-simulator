@@ -5,12 +5,10 @@ from models import db, User, Stats, DecisionLog
 
 app = Flask(__name__)
 
-# Brasília = UTC-3 (offset fixo; funciona no Windows sem pacote tzdata)
 BRASILIA = timezone(timedelta(hours=-3))
 
 
 def format_brasilia(dt):
-    """Converte datetime (UTC) para horário de Brasília e formata como dd/mm HH:mm."""
     if dt is None:
         return ""
     if dt.tzinfo is None:
@@ -28,83 +26,37 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
 # -----------------------------
-# DESAFIOS DINÂMICOS
+# DESAFIOS (XP AUMENTADO)
 # -----------------------------
 challenges = [
     {
         "id": 1,
         "title": "Incidente em produção",
         "prompt": "O servidor caiu em produção. O que você faz?",
-        "a": {
-            "text": "Revisar logs e métricas",
-            "xp": 40,
-            "rep": 5,
-            "stress": 10
-        },
-        "b": {
-            "text": "Reiniciar o servidor imediatamente",
-            "xp": 20,
-            "rep": -2,
-            "stress": 6
-        },
-        "c": {
-            "text": "Tomar um café e esperar alguém falar",
-            "xp": -10,
-            "rep": -6,
-            "stress": -8
-        }
+        "a": {"text": "Revisar logs e métricas", "xp": 70, "rep": 8, "stress": 12},
+        "b": {"text": "Reiniciar o servidor", "xp": 40, "rep": -2, "stress": 8},
+        "c": {"text": "Esperar alguém resolver", "xp": -25, "rep": -6, "stress": -5}
     },
     {
         "id": 2,
         "title": "Pull Request gigante",
-        "prompt": "Você recebeu um PR enorme e sem testes. O que faz?",
-        "a": {
-            "text": "Pede ajustes e sugere testes",
-            "xp": 35,
-            "rep": 6,
-            "stress": 8
-        },
-        "b": {
-            "text": "Aprova rápido para não atrasar a sprint",
-            "xp": 15,
-            "rep": -4,
-            "stress": 5
-        },
-        "c": {
-            "text": "Ignora e deixa para depois",
-            "xp": -12,
-            "rep": -7,
-            "stress": -3
-        }
+        "prompt": "Você recebeu um PR enorme.",
+        "a": {"text": "Pede testes", "xp": 60, "rep": 7, "stress": 10},
+        "b": {"text": "Aprova rápido", "xp": 30, "rep": -4, "stress": 6},
+        "c": {"text": "Ignora", "xp": -20, "rep": -7, "stress": -2}
     },
     {
         "id": 3,
-        "title": "Bug crítico do cliente",
-        "prompt": "Um cliente relatou um bug crítico em produção. Como você reage?",
-        "a": {
-            "text": "Reproduz o bug e cria um hotfix",
-            "xp": 45,
-            "rep": 8,
-            "stress": 12
-        },
-        "b": {
-            "text": "Responde que vai olhar depois",
-            "xp": 10,
-            "rep": -5,
-            "stress": 2
-        },
-        "c": {
-            "text": "Fecha o ticket sem investigar",
-            "xp": -15,
-            "rep": -10,
-            "stress": -4
-        }
+        "title": "Bug crítico",
+        "prompt": "Cliente encontrou um bug grave!",
+        "a": {"text": "Corrigir imediatamente", "xp": 80, "rep": 10, "stress": 15},
+        "b": {"text": "Colocar na backlog", "xp": 35, "rep": -5, "stress": 5},
+        "c": {"text": "Ignorar", "xp": -30, "rep": -10, "stress": -6}
     }
 ]
 
-
 # -----------------------------
-# DADOS INICIAIS
+# SEED
 # -----------------------------
 def seed_data():
     if User.query.first():
@@ -117,8 +69,8 @@ def seed_data():
     stats = Stats(
         user_id=user.id,
         level=1,
-        xp=750,
-        xp_max=1110,
+        xp=0,
+        xp_max=300,
         salary=3500,
         reputation=60,
         stress=50
@@ -139,20 +91,23 @@ def home():
 @app.route("/dashboard")
 def dashboard():
     user_id = session.get("user_id")
+
     if not user_id:
         return redirect(url_for("login"))
+
     user = User.query.get(user_id)
     stats = Stats.query.filter_by(user_id=user_id).first()
-    logs = (
-    DecisionLog.query
-    .filter_by(user_id=user_id)
-    .order_by(DecisionLog.created_at.desc())
-    .limit(5)
-    .all()
-)
 
     if not user or not stats:
         return redirect(url_for("login"))
+
+    logs = (
+        DecisionLog.query
+        .filter_by(user_id=user_id)
+        .order_by(DecisionLog.created_at.desc())
+        .limit(5)
+        .all()
+    )
 
     current_challenge = random.choice(challenges)
 
@@ -183,149 +138,150 @@ def dashboard():
 def choose():
     choice = request.form.get("choice")
     challenge_id = request.form.get("challenge_id", type=int)
+    user_id = session.get("user_id")
 
+    if not user_id:
+        return redirect(url_for("login"))
+
+    if not choice:
+        flash("Escolha inválida.", "danger")
+        return redirect(url_for("dashboard"))
+
+    stats = Stats.query.filter_by(user_id=user_id).first()
+
+    if not stats:
+        return redirect(url_for("login"))
+
+    challenge = next((c for c in challenges if c["id"] == challenge_id), None)
+
+    if not challenge:
+        flash("Desafio não encontrado.", "danger")
+        return redirect(url_for("dashboard"))
+
+    selected_option = challenge.get(choice.lower())
+
+    if not selected_option:
+        flash("Opção inválida.", "danger")
+        return redirect(url_for("dashboard"))
+
+    delta_xp = selected_option["xp"]
+    delta_rep = selected_option["rep"]
+    delta_stress = selected_option["stress"]
+
+    # BONUS XP
+    if delta_xp > 0:
+        delta_xp += 10
+
+    stats.xp += delta_xp
+    stats.reputation += delta_rep
+    stats.stress += delta_stress
+
+    stats.reputation = max(0, min(100, stats.reputation))
+    stats.stress = max(0, min(100, stats.stress))
+    stats.xp = max(0, stats.xp)
+
+    # LEVEL UP MELHORADO
+    while stats.xp >= stats.xp_max:
+        stats.xp -= stats.xp_max
+        stats.level += 1
+        stats.xp_max = int(stats.xp_max * 1.10)
+        stats.salary += 800
+
+    log = DecisionLog(
+        user_id=stats.user_id,
+        choice=choice,
+        delta_xp=delta_xp,
+        delta_reputation=delta_rep,
+        delta_stress=delta_stress,
+        challenge_title=challenge["title"]
+    )
+
+    db.session.add(log)
+    db.session.commit()
+
+    flash(f"Escolha {choice}: XP {delta_xp}", "info")
+
+    return redirect(url_for("dashboard"))
+
+
+@app.route("/reset", methods=["POST"])
+def reset():
     user_id = session.get("user_id")
 
     if not user_id:
         return redirect(url_for("login"))
 
     stats = Stats.query.filter_by(user_id=user_id).first()
-    challenge = next((c for c in challenges if c["id"] == challenge_id), None)
-    
-    if not challenge:
-        flash("Desafio não encontrado.", "info")
-        return redirect(url_for("dashboard"))
-
-    selected_option = challenge[choice.lower()]
-
-    delta_xp = selected_option["xp"]
-    delta_rep = selected_option["rep"]
-    delta_stress = selected_option["stress"]
-
-    stats.xp += delta_xp
-    stats.reputation += delta_rep
-    stats.stress += delta_stress
-
-    # limites para não quebrar a interface
-    stats.reputation = max(0, min(100, stats.reputation))
-    stats.stress = max(0, min(100, stats.stress))
-    stats.xp = max(0, stats.xp)
-
-    # level up
-    while stats.xp >= stats.xp_max:
-        stats.xp -= stats.xp_max
-        stats.level += 1
-        stats.xp_max = int(stats.xp_max * 1.15)
-        stats.salary += 500
-
-    log = DecisionLog(
-    user_id=stats.user_id,
-    choice=choice,
-    delta_xp=delta_xp,
-    delta_reputation=delta_rep,
-    delta_stress=delta_stress,
-    challenge_title=challenge["title"]
-)
-    db.session.add(log)
-
-    db.session.commit()
-
-    flash(
-        f"Escolha {choice}: XP {delta_xp}, Reputação {delta_rep}, Stress {delta_stress}.",
-        "info"
-    )
-
-    return redirect(url_for("dashboard"))
-
-@app.route("/reset", methods=["POST"])
-def reset():
-    stats = Stats.query.first()
 
     if not stats:
         return redirect(url_for("dashboard"))
 
-    # apaga histórico
-    DecisionLog.query.delete()
+    DecisionLog.query.filter_by(user_id=user_id).delete()
 
-    # reseta os atributos
-    stats.level = 3
-    stats.xp = 850
-    stats.xp_max = 1200
-    stats.salary = 7500
-    stats.reputation = 68
-    stats.stress = 72
+    stats.level = 1
+    stats.xp = 0
+    stats.xp_max = 300
+    stats.salary = 3500
+    stats.reputation = 60
+    stats.stress = 50
 
     db.session.commit()
 
-    flash("Progresso resetado com sucesso.", "info")
+    flash("Progresso resetado.", "info")
     return redirect(url_for("dashboard"))
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-
     if request.method == "POST":
-
         username = request.form.get("username")
         password = request.form.get("password")
 
         user = User.query.filter_by(username=username).first()
 
-        if user and password == "123":  # login provisório
-
+        if user and password == "123":
             session["user_id"] = user.id
-
-            flash("Login realizado com sucesso!", "success")
             return redirect(url_for("dashboard"))
 
-        flash("Usuário ou senha inválidos.", "danger")
+        flash("Login inválido.", "danger")
 
     return render_template("login.html")
 
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
-
     if request.method == "POST":
-
         username = request.form.get("username")
-        password = request.form.get("password")
 
-        existing_user = User.query.filter_by(username=username).first()
-
-        if existing_user:
-            flash("Nome de usuário já existe.", "danger")
+        if User.query.filter_by(username=username).first():
+            flash("Usuário já existe.", "danger")
             return redirect(url_for("register"))
 
         new_user = User(username=username)
         db.session.add(new_user)
         db.session.commit()
 
-        # cria stats iniciais
         stats = Stats(
             user_id=new_user.id,
             level=1,
-            xp=750,
-            xp_max=1110,
+            xp=0,
+            xp_max=300,
             salary=3500,
             reputation=60,
             stress=50
-    )
+        )
 
         db.session.add(stats)
         db.session.commit()
-
-        flash("Conta criada com sucesso!", "success")
 
         return redirect(url_for("login"))
 
     return render_template("register.html")
 
+
 @app.route("/logout")
 def logout():
-
     session.clear()
-
-    flash("Logout realizado.", "info")
     return redirect(url_for("home"))
 
 
@@ -338,8 +294,8 @@ def ranking():
         .limit(10)
         .all()
     )
-    return render_template("ranking.html", ranking=ranking_data)
 
+    return render_template("ranking.html", ranking=ranking_data)
 
 
 if __name__ == "__main__":
